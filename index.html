@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!--
+        [Deprecation] HTML Imports is deprecated and will be removed in M73, around March 2019. Please use ES modules instead. See https://www.chromestatus.com/features/5144752345317376 for more details.
+    -->
+    <!-- <link rel="import" href="file-template.html" id="templateFile"> -->
+    <!--
+        1. when clicking the card, it will be hidden.
+        2. wire up the "visible" attribute that it can be controlled from js.
+        
+        * adding event listener for click in the constructor, inside that function 
+            we change the visible property of the class to false
+        * connecting this to the visible attribute that the developer can set in the HTML 
+            markup we need to tell the browser that we intrested of knowing when this 
+            attribute changes - we do it with static class 
+            - observedAttributes > returns arrays with names of attributes we intrested
+            for monitoring change.
+        * we neet to initilset the visible property to its initial stateaize -this.visible = this.hasAttribute("visible");
+        * add getter and setter methods that will add or remove the visible attribue when the property is manipulated from javascript
+
+    -->
+    <title>Web Components Part 2</title>
+    <script>
+        class CardDetail extends HTMLElement {
+            constructor () {
+                super();
+
+                //click event to hide the card
+                this.addEventListener("click", e => {
+                    this.visible = false;
+                    console.log("card-detail hidden");
+                });
+            }
+            /** tell the browser the attributes we want to kkep track: 
+            observedAttribute is used to indicate which 
+            attributes will trigger the attributeChangedCallback function **/
+            static get observedAttributes() {
+                return ["visible"];
+            }
+
+            //** Custo element lifecycle functions **/
+            connectedCallBack() {
+                console.log("card-detail connected to page");
+                //set initial state of the visible property
+                this.visible = this.hasAttribute("visible");
+            }
+
+            disconnectedCallback () {
+                console.log("card-detail disconnected from page");
+            }
+
+            adoptedCallback () {
+                console.log("card-detail adopted in page");
+            }
+            
+            attributeChangedCallback (name, oldValue, newValue) {
+                if(newValue) {
+                    console.log("card-detail attr: " + name + "changed from" + oldValue + "to" + newVAlue);
+                }
+            }
+
+            //Expose the visible attribute as getter and setter
+            get visible() {
+                return this.hasAttribute("visible");
+            }
+            set visible(val) {
+                if (val) {
+                    return this.setAttribute("visible", "");
+                } else {
+                    return this.removeAttribute("visible");
+                }
+            }
+        }
+
+        //define the custom element for the browser
+        customElements.define("card-detail", CardDetail);
+
+        // (2) Programmatically show and hide the card by setting a property
+        
+        window.addEventListener("load", e => {
+            var card1 = document.getElementById("card1");
+            var card2 = document.getElementById("card2");
+            card1.visible = !card1.visible;
+            card2.visible = !card2.visible;
+
+            document.getElementById("createButton").addEventListener("click", e => {
+                var newcard = document.createElement ("card-detail");
+                newcard.innerHTML = "card created from script";
+                newcard.visible = true;
+                document.body.insertBefore(newcard, document.body.firstChild)
+            });
+        });
+    </script>
+    <style>
+        card-detail {
+            border: 1px solid #ccc;
+            margin: 10px;
+            padding: 10px;
+            text-align: center;
+            color: lightseagreen;
+            display: none;
+        }
+        card-detail[visible]{
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <p>creating and using twice the "card detail" component. <br>
+        adding it to the page without the "visible" attribute. <br>
+        on load, from js we change the attribut to visible . <br>
+        now we see them  on page.
+    </p>    
+    <p>click each of them to hide them, we can control them within
+        the component itself (class)
+    </p>
+    <p>
+        we can add more cards from js by clicking the button.     
+    </p>
+    <card-detail id="card1">
+        <div class="cardContainer">this is a card detail element 1</div>
+    </card-detail>
+    <card-detail id="card2">
+        <div class="cardContainer">this is a card detail element 2</div>
+    </card-detail>
+    <button id="createButton">create anothe card detail element</button>
+</body>
+</html>
