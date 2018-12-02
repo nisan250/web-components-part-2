@@ -1,8 +1,8 @@
-# Vue Training - tasks manager
+# Web Components Training
 
-Vue Training - simple example with a router
+Web Components Training - Custom Elements
 
 
 # Run This Project
 to run this project:
-click this link https://nisan250.github.io/tasks-vue/
+click this link https://nisan250.github.io/web-components-part-2/
